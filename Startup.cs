@@ -26,7 +26,16 @@ namespace Interactive_Storyteller_UI
         {
             services.AddRazorPages();
 
-
+            // Add authentication options for Microsoft.AspNetCore.Authentication.MicrosoftAccount
+            // Details: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/microsoft-logins?view=aspnetcore-5.0#configure-microsoft-account-authentication
+            services.AddAuthentication()
+                    .AddMicrosoftAccount( options =>
+                    {
+                        // Options "Authentication:Microsoft:ClientID" and "Authentication.Microsoft.ClientSecret" should be stored in dotnet user-secrets
+                        options.ClientId = Configuration["Authentication:Microsoft:ClientId"];
+                        options.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
+                    }      
+            );
 
             // Force redirect to HTTPS (443 for profuction or 5001 for local development)
             // Details: https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-5.0&tabs=netcore-cli#configure-permanent-redirects-in-production
