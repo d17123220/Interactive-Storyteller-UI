@@ -45,6 +45,7 @@ namespace Interactive_Storyteller_UI
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
