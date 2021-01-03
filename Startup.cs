@@ -14,15 +14,17 @@ namespace Interactive_Storyteller_UI
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
 
@@ -39,7 +41,7 @@ namespace Interactive_Storyteller_UI
 
             // Force redirect to HTTPS (443 for profuction or 5001 for local development)
             // Details: https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-5.0&tabs=netcore-cli#configure-permanent-redirects-in-production
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 services.AddHttpsRedirection( options =>
                 {
