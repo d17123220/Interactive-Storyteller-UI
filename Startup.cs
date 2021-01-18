@@ -26,6 +26,7 @@ namespace Interactive_Storyteller_UI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession();
             services.AddRazorPages();
 
             // Add authentication options for Microsoft.AspNetCore.Authentication.MicrosoftAccount
@@ -75,6 +76,7 @@ namespace Interactive_Storyteller_UI
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSession();
 
             app.UseRouting();
 

@@ -4,7 +4,16 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center align-middle">
+    @*Add image*@
+    <img srcset="~/img/unicorn.png 1.5x" />
+    <br />
+    @*Add form*@
+    <form method="post">
+        @*Add button*@
+        <button class="btn btn-success" style="Padding: 20pt; Margin: 40pt;" name="StartNew" value="YesStartIt" title="Start a new Fairytale">
+            Start<br />
+            New Fairy Tale
+        </button>
+    </form>
 </div>
