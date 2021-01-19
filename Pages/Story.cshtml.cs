@@ -16,6 +16,11 @@ namespace Interactive_Storyteller_UI.Pages
 
         public string StoryText { get; set; }
 
+        public string ErrorText { get; set; }
+
+        [BindProperty]
+        public string UserInput { get; set; }
+
         public StoryModel()
         {
 
@@ -23,10 +28,11 @@ namespace Interactive_Storyteller_UI.Pages
 
         public IActionResult OnGet()
         {
-            // Chekc if session variable is empty
+            // Check if session variable is empty
             if (String.IsNullOrEmpty(HttpContext.Session.GetString("SessionText")))
             {
-                // Check API if there is text generated for this session 
+                // Check API if there is text generated for this session
+                StoryText = null;
             }
             else
             {
@@ -37,16 +43,36 @@ namespace Interactive_Storyteller_UI.Pages
             return Page();
         }
 
-        public void OnPost()
+        public IActionResult OnPost()
         {
             // User posted some content
+            // Check with API if content is valid
+            bool checkContent = true;
 
-            // CHeck with API if content is valid
-
+            if (checkContent)
+            {
                 // Use API call to send new content to GPT model
-                // Add new text recieved from API to text and session
+                string apiContent = "!!API!!";
 
-                // Otherwise show error
+                // Add new text recieved from API to text and session
+                string newContent = HttpContext.Session.GetString("SessionText")+ "\n\n" + UserInput + "\n\n" + apiContent;
+                
+                // Update session variable with user input and content from API
+                HttpContext.Session.SetString("SessionText", newContent);
+                
+                // Apply new content to page model
+                StoryText = newContent;
+
+                // remove user input and any errors as successfull
+                UserInput = null;
+                ErrorText = null;
+            }
+            else
+            {
+                // Add error message
+                ErrorText = "Please enter correct text!";
+            }
+            return Page();
         }
 
         public IActionResult OnPostFinish(string FinishNow)

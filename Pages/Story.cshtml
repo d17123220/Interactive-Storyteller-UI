@@ -5,3 +5,27 @@
 }
 
 <!-- -->
+<form method="post">
+<div class="container w-100">
+    <div class="row w-100 mb-3">
+        <div class="col w-100">
+            <textarea  class="w-100" style="min-height: 50vh; resize:none" id="StoryText" name="StoryText" placeholder="To start, give us some ideas or details in the box below" readonly>@if (!String.IsNullOrEmpty(Model.StoryText))@Model.StoryText</textarea>
+        </div>
+    </div>
+    <div class="row w-100 mb-3">
+
+            <div class="col-sm-8">
+                <textarea class="w-100" style="min-height: 25vh; resize:none" id="UserInput" name="UserInput" placeholder="Type your text here">@if (!String.IsNullOrEmpty(Model.UserInput))@Model.UserInput</textarea>
+            </div>
+            <div class="col-sm-2 d-flex align-items-end">
+                <button class="btn btn-success w-100 mb-5 py-3" name="Submit" value="YesSubmit" title="Continue with Fairytale">Continue</button>
+            </div>
+            <div class="col-sm-2 d-flex align-items-end">
+                <button class="btn btn-warning w-100 mb-5 py-3" asp-page-handler="Finish" name="FinishNow" value="YesFinishNow" title="Finish Fairytale">
+                    Finish Story
+                </button>
+            </div>
+
+    </div>
+</div>
+</form>
