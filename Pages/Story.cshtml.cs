@@ -49,7 +49,12 @@ namespace Interactive_Storyteller_UI.Pages
             // Check with API if content is valid
             bool checkContent = true;
 
-            if (checkContent)
+            if (String.IsNullOrEmpty(UserInput))
+            {
+                // User didn't provide any input, so nothing to do
+                return Page();            
+            }
+            else if (checkContent)
             {
                 // Use API call to send new content to GPT model
                 string apiContent = "!!API!!";

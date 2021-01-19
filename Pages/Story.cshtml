@@ -29,3 +29,13 @@
     </div>
 </div>
 </form>
+
+
+@section scripts 
+{
+    @* //Script to always scroll to the bottom of text area on load *@
+    <script type="text/javascript" >
+        var textarea = document.getElementById("StoryText");
+        textarea.scrollTop = textarea.scrollHeight; 
+    </script>
+}
