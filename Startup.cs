@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Interactive_Storyteller_UI.Services;
 
 namespace Interactive_Storyteller_UI
 {
@@ -29,16 +30,28 @@ namespace Interactive_Storyteller_UI
             services.AddSession();
             services.AddRazorPages();
 
+            // Add IHttpClientFactory
+            // Details: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-3.1#typed-clients
+            services.AddHttpClient<IStorytellerAPIService, StorytellerAPIService>( 
+                client =>
+                {
+                    client.BaseAddress = new Uri(Configuration["IntaractiveStoryteller:API"]);
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+                    client.DefaultRequestHeaders.Add("User-Agent", "InteractiveStorytellerUI");
+                }   
+            );
+
             // Add authentication options for Microsoft.AspNetCore.Authentication.MicrosoftAccount
             // Details: https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/microsoft-logins?view=aspnetcore-5.0#configure-microsoft-account-authentication
             services.AddAuthentication()
-                    .AddMicrosoftAccount( options =>
-                    {
-                        // Options "Authentication:Microsoft:ClientID" and "Authentication.Microsoft.ClientSecret" should be stored in dotnet user-secrets
-                        options.ClientId = Configuration["Authentication:Microsoft:ClientId"];
-                        options.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
-                    }      
-            );
+                    .AddMicrosoftAccount( 
+                        options =>
+                        {
+                            // Options "Authentication:Microsoft:ClientID" and "Authentication.Microsoft.ClientSecret" should be stored in dotnet user-secrets
+                            options.ClientId = Configuration["Authentication:Microsoft:ClientId"];
+                            options.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
+                        }         
+                    );
 
             // Force redirect to HTTPS (443 for profuction or 5001 for local development)
             // Details: https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-5.0&tabs=netcore-cli#configure-permanent-redirects-in-production
