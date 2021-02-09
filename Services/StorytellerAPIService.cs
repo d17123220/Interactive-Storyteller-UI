@@ -53,9 +53,12 @@ namespace Interactive_Storyteller_UI.Services
             return sessionResponse.SessionID;
         }
 
-        public async Task<bool> DeleteSession(string userName, string sessionID)
+        public async Task DeleteSession(string userName, string sessionID)
         {
-            return false;
+            // use HttpClient to call for DELETE method to check if session exists
+            using var response = await _httpClient.DeleteAsync($"/api/Session/{userName}/{sessionID}");
+            // ensure recieved successfull answer 
+            response.EnsureSuccessStatusCode();
         }
 
     }

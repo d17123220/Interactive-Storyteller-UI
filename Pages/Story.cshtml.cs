@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Interactive_Storyteller_UI.Services;
 
 namespace Interactive_Storyteller_UI.Pages
 {
@@ -21,13 +23,25 @@ namespace Interactive_Storyteller_UI.Pages
         [BindProperty]
         public string UserInput { get; set; }
 
-        public StoryModel()
-        {
+        private IStorytellerAPIService _storytllerAPI;
+        private UserManager<IdentityUser> _userManager;
 
+        public StoryModel(IStorytellerAPIService storytllerAPI, UserManager<IdentityUser> userManager)
+        {
+            _storytllerAPI = storytllerAPI;
+            _userManager = userManager;
         }
 
         public IActionResult OnGet()
         {
+            // recover sessionID                
+            var sessionID = HttpContext.Session.GetString("SessionID");
+            if (string.IsNullOrEmpty(sessionID))
+            {
+                HttpContext.Session.Clear();
+                return RedirectToPage("Index");
+            }
+
             // Check if session variable is empty
             if (String.IsNullOrEmpty(HttpContext.Session.GetString("SessionText")))
             {
@@ -45,6 +59,14 @@ namespace Interactive_Storyteller_UI.Pages
 
         public IActionResult OnPost()
         {
+            // recover sessionID                
+            var sessionID = HttpContext.Session.GetString("SessionID");
+            if (string.IsNullOrEmpty(sessionID))
+            {
+                HttpContext.Session.Clear();
+                return RedirectToPage("Index");
+            }
+
             // User posted some content
             // Check with API if content is valid
             bool checkContent = true;
@@ -80,11 +102,30 @@ namespace Interactive_Storyteller_UI.Pages
             return Page();
         }
 
-        public IActionResult OnPostFinish(string FinishNow)
+        public async Task<IActionResult> OnPostFinish(string FinishNow)
         {
+            // recover sessionID                
+            var sessionID = HttpContext.Session.GetString("SessionID");
+            if (string.IsNullOrEmpty(sessionID))
+            {
+                HttpContext.Session.Clear();
+                return RedirectToPage("Index");
+            }
+
+            // Check if correctly passing data
             if (FinishNow.Equals("YesFinishNow"))
             {
+                string userName = null;
+                // get email address of the user
+                var user = await _userManager.GetUserAsync(User);
+                if (null != user)
+                    userName = user.Email;
+                else
+                    // for debug purposes, use temporary email
+                    userName = "demo@email.address";
+
                 // Send a call to API to finish session
+                await _storytllerAPI.DeleteSession(userName, sessionID);
 
                 // Remove session variables
                 HttpContext.Session.Clear();

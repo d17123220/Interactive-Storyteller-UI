@@ -8,7 +8,7 @@ namespace Interactive_Storyteller_UI.Services
     {
         Task<bool> CheckSession(string userName, string sessionID);
         Task<string> CreateNewSession(string userName);
-        Task<bool> DeleteSession(string userName, string sessionID);
+        Task DeleteSession(string userName, string sessionID);
 
     }
 }
