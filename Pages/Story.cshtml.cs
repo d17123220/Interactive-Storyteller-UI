@@ -23,6 +23,8 @@ namespace Interactive_Storyteller_UI.Pages
         [BindProperty]
         public string UserInput { get; set; }
 
+        public HashSet<string> OffenciveTerms { get; set; }
+
         private IStorytellerAPIService _storytllerAPI;
         private UserManager<IdentityUser> _userManager;
 
@@ -30,6 +32,7 @@ namespace Interactive_Storyteller_UI.Pages
         {
             _storytllerAPI = storytllerAPI;
             _userManager = userManager;
+            OffenciveTerms = new HashSet<string>();
         }
 
         public IActionResult OnGet()
@@ -57,7 +60,7 @@ namespace Interactive_Storyteller_UI.Pages
             return Page();
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // recover sessionID                
             var sessionID = HttpContext.Session.GetString("SessionID");
@@ -68,36 +71,48 @@ namespace Interactive_Storyteller_UI.Pages
             }
 
             // User posted some content
-            // Check with API if content is valid
-            bool checkContent = true;
-
             if (String.IsNullOrEmpty(UserInput))
             {
                 // User didn't provide any input, so nothing to do
                 return Page();            
             }
-            else if (checkContent)
-            {
-                // Use API call to send new content to GPT model
-                string apiContent = "!!API!!";
-
-                // Add new text recieved from API to text and session
-                string newContent = HttpContext.Session.GetString("SessionText")+ "\n\n" + UserInput + "\n\n" + apiContent;
-                
-                // Update session variable with user input and content from API
-                HttpContext.Session.SetString("SessionText", newContent);
-                
-                // Apply new content to page model
-                StoryText = newContent;
-
-                // remove user input and any errors as successfull
-                UserInput = null;
-                ErrorText = null;
-            }
             else
             {
-                // Add error message
-                ErrorText = "Please enter correct text!";
+                // Check with API if content is valid
+                var newContext = await _storytllerAPI.CheckContext(UserInput);
+
+                // Update input field with corrected text
+                UserInput = newContext.CorrectedText;
+
+                if (!newContext.IsBounced)
+                {
+                    // Use API call to send new content to GPT model
+                    string apiContent = "!!API!!";
+
+                    // Add new text recieved from API to text and session
+                    string newContent = HttpContext.Session.GetString("SessionText")+ "\n\n" + UserInput + "\n\n" + apiContent;
+                    
+                    // Update session variable with user input and content from API
+                    HttpContext.Session.SetString("SessionText", newContent);
+                    
+                    // Apply new content to page model
+                    StoryText = newContent;
+
+                    // remove user input and any errors as successfull
+                    UserInput = null;
+                    ErrorText = null;
+                }
+                else
+                {
+                    // set list of terms which are considered to be offensive
+                    OffenciveTerms = newContext.OffensiveTerms.ToHashSet();
+                    
+                    // Return back stored in session text
+                    StoryText =  HttpContext.Session.GetString("SessionText");
+
+                    // Add error message
+                    ErrorText = "Please enter correct text!";
+                }
             }
             return Page();
         }

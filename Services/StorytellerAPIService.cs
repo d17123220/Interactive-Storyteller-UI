@@ -1,13 +1,15 @@
 namespace Interactive_Storyteller_UI.Services
 {
 
+    using System;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Text.Json;
     using System.Text;
     using Interactive_Storyteller_UI.Models;
-    
+ 
 
     public class StorytellerAPIService : IStorytellerAPIService
     {
@@ -37,7 +39,6 @@ namespace Interactive_Storyteller_UI.Services
             sessionRequest.UserName = userName;
             
             // serialize object to JSON
-            var tmp = JsonSerializer.Serialize(sessionRequest);
             var jsonRequest = new StringContent(JsonSerializer.Serialize(sessionRequest), Encoding.UTF8, "application/json");
             
             // use HttpClient to call for POST method and upload JSON object
@@ -47,7 +48,7 @@ namespace Interactive_Storyteller_UI.Services
 
             // decode answer into stream and de-serialize stream into Session object
             using var responseStream = await response.Content.ReadAsStreamAsync();
-                var sessionResponse = await JsonSerializer.DeserializeAsync<Session>(responseStream);
+            var sessionResponse = await JsonSerializer.DeserializeAsync<Session>(responseStream);
             
             // return sessionID from recieved object 
             return sessionResponse.SessionID;
@@ -60,6 +61,29 @@ namespace Interactive_Storyteller_UI.Services
             // ensure recieved successfull answer 
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task<ScreenedContext> CheckContext(string userText)
+        {
+            Object userInput = new {text = userText};
+            // generate a new request body
+            var jsonRequest = new StringContent(JsonSerializer.Serialize(userInput), Encoding.UTF8, "application/json");
+            
+            // use HttpClient to call for POST method and upload TEXT object
+            using var response = await _httpClient.PostAsync("/api/Context/Check", jsonRequest);
+            // ensure recieved succsessfull answer
+            response.EnsureSuccessStatusCode();
+
+            // decode answer into stream and de-serialize stream into ScreenedContext object
+            using var responseStream = await response.Content.ReadAsStreamAsync();
+            var sessionResponse = await JsonSerializer.DeserializeAsync<ScreenedContext>(responseStream);
+            if (sessionResponse.OffensiveTerms.Any())
+                sessionResponse.IsBounced = true;
+            else
+                sessionResponse.IsBounced = false;
+            
+            return sessionResponse;
+        }
+
 
     }
 }

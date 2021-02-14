@@ -15,7 +15,7 @@
     <div class="row w-100 mb-3">
 
             <div class="col-sm-8">
-                <textarea class="w-100" style="min-height: 25vh; resize:none" id="UserInput" name="UserInput" placeholder="Type your text here">@if (!String.IsNullOrEmpty(Model.UserInput))@Model.UserInput</textarea>
+                <textarea spellcheck="true" class="w-100" style="min-height: 25vh; resize:none" id="UserInput" name="UserInput" placeholder="Type your text here">@if (!String.IsNullOrEmpty(Model.UserInput))@Model.UserInput</textarea>
             </div>
             <div class="col-sm-2 d-flex align-items-end">
                 <button class="btn btn-success w-100 mb-5 py-3" name="Submit" value="YesSubmit" title="Continue with Fairytale">Continue</button>
