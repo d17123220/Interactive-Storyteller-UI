@@ -9,19 +9,16 @@ namespace Interactive_Storyteller_UI.Models
         public string Id { get; set; }
 
         [JsonPropertyName("sessionID")]
-        public long SessionID { get; set; }
+        public string SessionID { get; set; }
 
-        [JsonPropertyName("context")]
+        [JsonPropertyName("sessionText")]
         public string SessionText { get; set; }
 
         [JsonPropertyName("contextCreator")]
-        public string Creator { get; set; }
+        public string ContextCreator { get; set; }
 
-        [JsonPropertyName("contextSequence")]
+        [JsonPropertyName("sequenceNumber")]
         public long SequenceNumber { get; set; }
-
-        [JsonPropertyName("screenedContext")]
-        public ScreenedContext UserInput { get; set; }
 
     }
 

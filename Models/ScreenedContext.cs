@@ -14,6 +14,7 @@ namespace Interactive_Storyteller_UI.Models
         [JsonPropertyName("offensiveTerms")]
         public ISet<string> OffensiveTerms { get; set; }
 
+        [JsonPropertyName("isBounced")]
         public bool IsBounced { get; set; }
 
     }
