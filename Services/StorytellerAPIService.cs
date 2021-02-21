@@ -2,12 +2,11 @@ namespace Interactive_Storyteller_UI.Services
 {
 
     using System;
-    using System.Net.Http;
-    using System.Threading.Tasks;
-    using System.Linq;
     using System.Collections.Generic;
-    using System.Text.Json;
+    using System.Net.Http;
     using System.Text;
+    using System.Text.Json;
+    using System.Threading.Tasks;
     using Interactive_Storyteller_UI.Models;
  
 
@@ -69,21 +68,44 @@ namespace Interactive_Storyteller_UI.Services
             var jsonRequest = new StringContent(JsonSerializer.Serialize(userInput), Encoding.UTF8, "application/json");
             
             // use HttpClient to call for POST method and upload TEXT object
-            using var response = await _httpClient.PostAsync("/api/Context/Check", jsonRequest);
+            using var response = await _httpClient.PostAsync("/api/Context/Check/from-Interactive-Storyteller-UI", jsonRequest);
             // ensure recieved succsessfull answer
             response.EnsureSuccessStatusCode();
 
             // decode answer into stream and de-serialize stream into ScreenedContext object
             using var responseStream = await response.Content.ReadAsStreamAsync();
             var sessionResponse = await JsonSerializer.DeserializeAsync<ScreenedContext>(responseStream);
-            if (sessionResponse.OffensiveTerms.Any())
-                sessionResponse.IsBounced = true;
-            else
-                sessionResponse.IsBounced = false;
             
             return sessionResponse;
         }
 
+        public async Task<Dictionary<string, Object>> AddUserContext(string userText, string sessionId)
+        {
+            var returnHash = new Dictionary<string, Object>();
+            var ScreenedContext = await CheckContext(userText);
+
+            returnHash["ScreenedContext"] = ScreenedContext;
+            if (!ScreenedContext.IsBounced)
+            {            
+                var userInput = new {text = userText, sessionID = sessionId};
+
+                // generate a new request body
+                var jsonRequest = new StringContent(JsonSerializer.Serialize(userInput), Encoding.UTF8, "application/json");
+                
+                // use HttpClient to call for POST method and upload TEXT object
+                using var response = await _httpClient.PostAsync("/api/Context", jsonRequest);
+                // ensure recieved succsessfull answer
+                response.EnsureSuccessStatusCode();
+
+                // decode answer into stream and de-serialize stream into ScreenedContext object
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                var contextResponse = await JsonSerializer.DeserializeAsync<Context>(responseStream);
+                
+                returnHash["APIContext"] = contextResponse;              
+            }
+
+            return returnHash;
+        }
 
     }
 }
