@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Interactive_Storyteller_UI.Services;
+using Interactive_Storyteller_UI.Models;
 
 namespace Interactive_Storyteller_UI.Pages
 {
@@ -79,18 +79,20 @@ namespace Interactive_Storyteller_UI.Pages
             else
             {
                 // Check with API if content is valid
-                var newContext = await _storytllerAPI.CheckContext(UserInput);
+                // and Use API call to send this content to GPT model
+                var context = await _storytllerAPI.AddUserContext(UserInput, sessionID);
 
                 // Update input field with corrected text
-                UserInput = newContext.CorrectedText;
+                ScreenedContext userContext = (ScreenedContext) context["ScreenedContext"];
+                Context apiContext = (Context) context["APIContext"];
 
-                if (!newContext.IsBounced)
+                UserInput = userContext.CorrectedText;
+
+                if (!userContext.IsBounced)
                 {
-                    // Use API call to send new content to GPT model
-                    string apiContent = "!!API!!";
 
                     // Add new text recieved from API to text and session
-                    string newContent = HttpContext.Session.GetString("SessionText")+ "\n\n" + UserInput + "\n\n" + apiContent;
+                    string newContent = HttpContext.Session.GetString("SessionText")+ "\n\n" + UserInput + "\n\n" + apiContext.SessionText;
                     
                     // Update session variable with user input and content from API
                     HttpContext.Session.SetString("SessionText", newContent);
@@ -105,7 +107,7 @@ namespace Interactive_Storyteller_UI.Pages
                 else
                 {
                     // set list of terms which are considered to be offensive
-                    OffenciveTerms = newContext.OffensiveTerms.ToHashSet();
+                    OffenciveTerms = userContext.OffensiveTerms.ToHashSet();
                     
                     // Return back stored in session text
                     StoryText =  HttpContext.Session.GetString("SessionText");
