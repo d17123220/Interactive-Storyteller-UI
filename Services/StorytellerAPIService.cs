@@ -107,5 +107,16 @@ namespace Interactive_Storyteller_UI.Services
             return returnHash;
         }
 
+        public async Task<IEnumerable<Context>> GetContextForSession(string userName, string sessionID)
+        {
+            // use HttpClient to call for GET method to check if session exists
+            var response = await _httpClient.GetAsync($"/api/Context/{userName}/{sessionID}");
+            // ensure recieved successfull answer 
+            response.EnsureSuccessStatusCode();
+
+            // decode answer into stream and de-serialize it from JSON to bool
+            using var responseStream = await response.Content.ReadAsStreamAsync();
+                return await JsonSerializer.DeserializeAsync<List<Context>>(responseStream);
+        }
     }
 }

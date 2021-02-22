@@ -13,6 +13,6 @@ namespace Interactive_Storyteller_UI.Services
         Task DeleteSession(string userName, string sessionID);
         Task<ScreenedContext> CheckContext(string text);
         Task<Dictionary<string, Object>> AddUserContext(string userText, string sessionId);
-
+        Task<IEnumerable<Context>> GetContextForSession(string userName, string sessionID);
     }
 }

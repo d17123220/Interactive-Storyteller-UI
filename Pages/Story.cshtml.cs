@@ -27,15 +27,17 @@ namespace Interactive_Storyteller_UI.Pages
 
         private IStorytellerAPIService _storytllerAPI;
         private UserManager<IdentityUser> _userManager;
+        private string userName;
 
         public StoryModel(IStorytellerAPIService storytllerAPI, UserManager<IdentityUser> userManager)
         {
             _storytllerAPI = storytllerAPI;
             _userManager = userManager;
             OffenciveTerms = new HashSet<string>();
+
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
             // recover sessionID                
             var sessionID = HttpContext.Session.GetString("SessionID");
@@ -48,14 +50,31 @@ namespace Interactive_Storyteller_UI.Pages
             // Check if session variable is empty
             if (String.IsNullOrEmpty(HttpContext.Session.GetString("SessionText")))
             {
+                // get email address of the user
+                var user = await _userManager.GetUserAsync(User);
+                if (null != user)
+                    userName = user.Email;
+                else
+                    // for debug purposes, use temporary email
+                    userName = "demo@email.address";
+                
                 // Check API if there is text generated for this session
-                StoryText = null;
+                var textSoFar = await _storytllerAPI.GetContextForSession(userName, sessionID);
+                if (null != textSoFar && textSoFar.Any())
+                {
+                    StoryText = "Story so far:";
+                    foreach (var context in textSoFar)
+                    {
+                        StoryText += "\n\n" + context.SessionText;
+                    }
+                }
+                else
+                    StoryText = null;
+
             }
             else
-            {
                 // get story text from session
                 StoryText = HttpContext.Session.GetString("SessionText");
-            }
             
             return Page();
         }
@@ -132,7 +151,6 @@ namespace Interactive_Storyteller_UI.Pages
             // Check if correctly passing data
             if (FinishNow.Equals("YesFinishNow"))
             {
-                string userName = null;
                 // get email address of the user
                 var user = await _userManager.GetUserAsync(User);
                 if (null != user)
