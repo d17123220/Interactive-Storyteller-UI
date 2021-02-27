@@ -116,7 +116,10 @@ namespace Interactive_Storyteller_UI.Services
 
             // decode answer into stream and de-serialize it from JSON to bool
             using var responseStream = await response.Content.ReadAsStreamAsync();
+            if (responseStream.Length > 0)
                 return await JsonSerializer.DeserializeAsync<List<Context>>(responseStream);
+            else
+                return null;
         }
     }
 }
