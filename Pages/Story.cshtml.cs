@@ -4,15 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Interactive_Storyteller_UI.Services;
 using Interactive_Storyteller_UI.Models;
 
+
 namespace Interactive_Storyteller_UI.Pages
 {
-    //[Authorize]
+    [Authorize]
     public class StoryModel : PageModel
     {
 
@@ -103,13 +105,12 @@ namespace Interactive_Storyteller_UI.Pages
 
                 // Update input field with corrected text
                 ScreenedContext userContext = (ScreenedContext) context["ScreenedContext"];
-                Context apiContext = (Context) context["APIContext"];
 
                 UserInput = userContext.CorrectedText;
 
                 if (!userContext.IsBounced)
                 {
-
+                    Context apiContext = (Context) context["APIContext"];
                     // Add new text recieved from API to text and session
                     string newContent = HttpContext.Session.GetString("SessionText")+ "\n\n" + UserInput + "\n\n" + apiContext.SessionText;
                     

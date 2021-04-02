@@ -13,7 +13,7 @@ using Interactive_Storyteller_UI.Services;
 
 namespace Interactive_Storyteller_UI.Pages
 {
-    //[Authorize]
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
