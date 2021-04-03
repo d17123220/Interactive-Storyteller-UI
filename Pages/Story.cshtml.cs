@@ -25,7 +25,7 @@ namespace Interactive_Storyteller_UI.Pages
         [BindProperty]
         public string UserInput { get; set; }
 
-        public HashSet<string> OffenciveTerms { get; set; }
+        public HashSet<string> OffensiveTerms { get; set; }
 
         private IStorytellerAPIService _storytllerAPI;
         private UserManager<IdentityUser> _userManager;
@@ -35,7 +35,7 @@ namespace Interactive_Storyteller_UI.Pages
         {
             _storytllerAPI = storytllerAPI;
             _userManager = userManager;
-            OffenciveTerms = new HashSet<string>();
+            OffensiveTerms = new HashSet<string>();
 
         }
 
@@ -127,7 +127,7 @@ namespace Interactive_Storyteller_UI.Pages
                 else
                 {
                     // set list of terms which are considered to be offensive
-                    OffenciveTerms = userContext.OffensiveTerms.ToHashSet();
+                    OffensiveTerms = userContext.OffensiveTerms.ToHashSet();
                     
                     // Return back stored in session text
                     StoryText =  HttpContext.Session.GetString("SessionText");
